@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Harness: run an external Cursor agent in plan mode to review the last git commit
+# Harness: run an external Cursor agent to review the last git commit
 # against the workspace's own documented standards (CLAUDE.md and any file it
 # designates as binding).
 # Creates a dedicated chat session and pins all work to it.

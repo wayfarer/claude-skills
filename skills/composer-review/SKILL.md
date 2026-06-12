@@ -34,7 +34,7 @@ skill's base directory (shown in the invocation header as
 - **`resolve-model.sh [semantic-name]`** — normalizes the model argument to a canonical
   `agent --model` ID. Called once; the resolved ID is passed to both harnesses.
 - **`composer-plan.sh [workspace] [model-id]`** — creates a dedicated chat session,
-  then runs `agent --print --plan --trust --resume <chat-id> --model <model-id>`. The
+  then runs `agent --print --yolo --trust --resume <chat-id> --model <model-id>`. The
   plan prompt instructs the agent to read the workspace's `CLAUDE.md` (and any file it
   designates as binding) and check the last commit against every rule documented there.
   Output starts with `CHAT_ID: <uuid>` (from the script), followed by the agent's
@@ -63,17 +63,30 @@ MODEL=$("$SKILL_DIR"/scripts/resolve-model.sh "$ARGUMENTS")
 If `resolve-model.sh` exits 1, stop and show its error message to the user — do not
 proceed.
 
-**3. Run the plan harness and capture output**
+**3. Run the plan harness as a background task**
+
+Launch `composer-plan.sh` via the Bash tool with `run_in_background: true`. Inference
+typically takes 5–20 minutes; running in background lets you continue responding to the
+user. Tell the user the task is running and you will report back when it finishes.
+
+When the background task completes, read its terminal output file (path from the
+task notification, or poll with `Await` until it finishes). Set `OUTPUT_FILE` to that
+path:
 ```bash
-PLAN_OUTPUT=$("$SKILL_DIR"/scripts/composer-plan.sh "$PWD" "$MODEL")
-echo "$PLAN_OUTPUT"
+OUTPUT_FILE="<path-from-notification>"
+cat "$OUTPUT_FILE"
 ```
+
+If the task exited non-zero, stop and show the output to the user — do not proceed.
 
 **4. Parse the chat ID and verdict**
 ```bash
-CHAT_ID=$(echo "$PLAN_OUTPUT" | grep "^CHAT_ID:" | head -1 | awk '{print $2}')
-VERDICT=$(echo "$PLAN_OUTPUT" | grep "^PLAN_NEEDED:" | head -1 | awk '{print $2}')
+CHAT_ID=$(grep "^CHAT_ID:" "$OUTPUT_FILE" | head -1 | awk '{print $2}')
+VERDICT=$(grep "^PLAN_NEEDED:" "$OUTPUT_FILE" | head -1 | awk '{print $2}')
 ```
+
+If either value is empty, or `VERDICT` is neither `yes` nor `no`, stop and show the
+output to the user — do not run the execute harness.
 
 **5. Branch on verdict**
 
@@ -90,6 +103,7 @@ the agent's output. Do not run the execute harness.
 - The model is the only knob. There is no env-var override — use the argument.
 - The skill reviews against the **workspace's** `CLAUDE.md`, so it stays calibrated by
   whatever standards that project documents. Keep `CLAUDE.md` current.
-- The plan harness is read-only (`--plan`); it cannot edit files. The execute harness
-  uses `--yolo` for full tool access.
+- Both harnesses use `--yolo` for full tool access. The plan phase needs `--yolo` so
+  read-only commands like `git log` and file reads are not blocked; review-only intent
+  is enforced by the prompt, not by tool gating.
 - Requires the `agent` (Cursor Agent) CLI on `PATH`.
