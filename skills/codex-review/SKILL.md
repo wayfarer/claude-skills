@@ -8,20 +8,30 @@ remediation if needed. Works in any workspace that has a `CLAUDE.md`.
 
 `/codex-review [model]`
 
-`[model]` is optional. With no argument, defaults to `o3`. Accepts semantic names —
-spacing and case are normalized before resolution:
+`[model]` is optional. With no argument, defaults to `gpt-5.5` at medium reasoning
+effort. Accepts semantic names — spacing and case are normalized before resolution:
 
 | You type | Resolves to |
 |---|---|
-| *(omitted)* | `o3` |
-| `o4-mini` | `o4-mini` |
-| `o4` | `o4` |
-| `o3-mini` | `o3-mini` |
-| `gpt-5.5` | `gpt-5.5` |
-| `gpt-5.4` | `gpt-5.4` |
-| `codex spark` | `gpt-5.3-codex-spark` |
+| *(omitted)* | `gpt-5.5` @ medium effort |
+| `gpt-5.5` | `gpt-5.5` @ medium |
+| `gpt-5.5 low` | `gpt-5.5` @ low |
+| `gpt-5.5 high` | `gpt-5.5` @ high |
+| `gpt-5.5 xhigh` | `gpt-5.5` @ xhigh |
+| `gpt-5.4` | `gpt-5.4` @ medium |
+| `gpt-5.4 low` / `medium` / `high` / `xhigh` | `gpt-5.4` @ that tier |
+| `gpt-5.4-mini` | `gpt-5.4-mini` @ medium |
+| `codex spark` | `gpt-5.3-codex-spark` @ medium |
+| `o3` | `o3` (intrinsic reasoning, no effort flag) |
+| `o4-mini` | `o4-mini` (intrinsic reasoning) |
+| `o4` | `o4` (intrinsic reasoning) |
+| `o3-mini` | `o3-mini` (intrinsic reasoning) |
 
 Any full model ID is also accepted verbatim.
+
+Reasoning effort (`low`/`medium`/`high`/`xhigh`) is passed to the Codex CLI as
+`-c model_reasoning_effort=<tier>`. o-series models manage their own reasoning depth
+and do not use this flag.
 
 ## How it works
 
@@ -31,13 +41,14 @@ skill's base directory (shown in the invocation header as
 `SKILL_DIR` be that base directory.
 
 - **`resolve-model.sh [semantic-name]`** — normalizes the model argument to a canonical
-  `codex -m` ID. Called once; the resolved ID is passed to both harnesses.
-- **`codex-plan.sh [workspace] [model-id]`** — runs `codex exec review --commit HEAD`
+  model spec (`MODEL_ID` or `MODEL_ID:EFFORT`). Called once; the resolved spec is
+  passed to both harnesses.
+- **`codex-plan.sh [workspace] [model-spec]`** — runs `codex exec review --commit HEAD`
   with a custom prompt that instructs the agent to check `CLAUDE.md` and emit
   `PLAN_NEEDED: yes` or `PLAN_NEEDED: no` as the first line. The review is captured
   to a temp file via `-o`. Output starts with `REVIEW_FILE: <path>` (emitted by the
   script), followed by the agent's response.
-- **`codex-execute.sh <review-file> [workspace] [model-id]`** — runs
+- **`codex-execute.sh <review-file> [workspace] [model-spec]`** — runs
   `codex exec -s workspace-write` with the review output embedded in the prompt via
   stdin, so the agent has full context to apply fixes and commit.
 

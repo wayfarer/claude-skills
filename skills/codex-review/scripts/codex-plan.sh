@@ -6,12 +6,23 @@
 # Output always contains:
 #   REVIEW_FILE: <path>     (first line, emitted by this script)
 #   PLAN_NEEDED: yes|no     (from the agent, in the captured review)
-# Usage: codex-plan.sh [workspace-path] [model-id]
+# Usage: codex-plan.sh [workspace-path] [model-spec]
+# model-spec is MODEL_ID or MODEL_ID:EFFORT (e.g. gpt-5.5:high)
 
 set -euo pipefail
 
 WORKSPACE="${1:-$(pwd)}"
-MODEL="${2:-o3}"
+MODEL_SPEC="${2:-gpt-5.5:medium}"
+
+# Parse model spec: split on : into model ID and optional reasoning effort
+if [[ "$MODEL_SPEC" == *:* ]]; then
+  MODEL_ID="${MODEL_SPEC%%:*}"
+  REASONING_EFFORT="${MODEL_SPEC##*:}"
+  EFFORT_ARGS=(-c "model_reasoning_effort=$REASONING_EFFORT")
+else
+  MODEL_ID="$MODEL_SPEC"
+  EFFORT_ARGS=()
+fi
 
 COMMIT_SHA=$(git -C "$WORKSPACE" rev-parse HEAD)
 COMMIT_TITLE=$(git -C "$WORKSPACE" log -1 --format="%s")
@@ -44,7 +55,8 @@ codex exec review \
   -C "$WORKSPACE" \
   --commit "$COMMIT_SHA" \
   --title "$COMMIT_TITLE" \
-  -m "$MODEL" \
+  -m "$MODEL_ID" \
+  "${EFFORT_ARGS[@]}" \
   --ephemeral \
   -o "$REVIEW_FILE" \
   "$PROMPT"
