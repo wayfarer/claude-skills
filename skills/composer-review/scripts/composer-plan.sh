@@ -16,7 +16,10 @@ MODEL="${2:-composer-2.5}"
 CHAT_ID=$(agent create-chat)
 echo "CHAT_ID: $CHAT_ID"
 
-PROMPT=$(cat <<'EOF'
+# Note: read -r -d '' (not $(cat <<EOF)) because macOS bash 3.2 mis-parses a
+# heredoc nested inside command substitution. read returns non-zero at EOF, so
+# `|| true` keeps it happy under `set -e`.
+read -r -d '' PROMPT <<'EOF' || true
 You are reviewing the last git commit in this workspace for compliance with the
 project's own documented standards.
 
@@ -41,6 +44,5 @@ line):
 PLAN_NEEDED: no
 Then tell a programming joke.
 EOF
-)
 
 agent --print --plan --trust --resume "$CHAT_ID" --model "$MODEL" --workspace "$WORKSPACE" "$PROMPT"
