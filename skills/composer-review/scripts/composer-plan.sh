@@ -45,4 +45,4 @@ PLAN_NEEDED: no
 Then tell a programming joke.
 EOF
 
-agent --print --plan --trust --resume "$CHAT_ID" --model "$MODEL" --workspace "$WORKSPACE" "$PROMPT"
+agent --print --yolo --trust --resume "$CHAT_ID" --model "$MODEL" --workspace "$WORKSPACE" "$PROMPT"
