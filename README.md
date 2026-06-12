@@ -18,6 +18,10 @@ here is globally available. To add a skill, create `skills/<name>/SKILL.md`
 
 ## Skills
 
+- **codex-review** — runs an external OpenAI Codex agent (`codex exec review`) against
+  the last git commit, checks it for compliance with the workspace's `CLAUDE.md`, and
+  executes remediation if needed. Defaults to `o3`; accepts an optional model argument.
+  Requires the `codex` CLI on `PATH` and valid OpenAI auth.
 - **composer-review** — drives an external Cursor agent (`agent` CLI, Composer 2.5
   by default) to review the last git commit against the workspace's own `CLAUDE.md`,
   then execute remediation. Project-agnostic: it reads whatever standards the current
