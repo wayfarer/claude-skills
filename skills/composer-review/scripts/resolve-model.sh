@@ -57,9 +57,17 @@ case "$normalized" in
   "sonnet-4.6-thinking"|"sonnet-4.6-think")
     echo "claude-4.6-sonnet-medium-thinking" ;;
 
-  # Pass-through: if it already looks like a full model ID (contains at least one dot or two hyphens), trust it
-  *"."*|*"-"*"-"*)
-    echo "$normalized" ;;
+  # Pass-through: if it already looks like a full model ID (contains a digit AND
+  # at least one dot or two hyphens), trust it — but warn so typos surface.
+  *[0-9]*)
+    case "$normalized" in
+      *"."*|*"-"*"-"*)
+        echo "WARNING: '${input}' is not a known alias; passing through verbatim. Run \`agent models\` to verify." >&2
+        echo "$normalized" ;;
+      *)
+        echo "ERROR: unrecognized model '${input}'. Run \`agent models\` to see valid IDs." >&2
+        exit 1 ;;
+    esac ;;
 
   *)
     echo "ERROR: unrecognized model '${input}'. Run \`agent models\` to see valid IDs." >&2

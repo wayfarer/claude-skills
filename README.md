@@ -24,9 +24,9 @@ here is globally available. To add a skill, create `skills/<name>/SKILL.md`
   supports full tier control (low/medium/high/xhigh) and o-series models. Requires the
   `codex` CLI on `PATH` and valid OpenAI auth.
 - **composer-review** — drives an external Cursor agent (`agent` CLI, Composer 2.5
-  by default) to review the last git commit against the workspace's own `CLAUDE.md`,
-  then execute remediation. Project-agnostic: it reads whatever standards the current
-  project documents.
+  by default) to review a commit range against the workspace's own `CLAUDE.md`,
+  then execute remediation. Reviews the last commit by default; pass `--range <rev-range>`
+  to widen it. Project-agnostic: it reads whatever standards the current project documents.
 - **subagent-model** — sets the model used for subagents spawned via the Agent tool
   for the remainder of a conversation.
 
