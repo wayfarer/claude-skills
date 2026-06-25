@@ -18,11 +18,12 @@ here is globally available. To add a skill, create `skills/<name>/SKILL.md`
 
 ## Skills
 
-- **codex-review** — runs an external OpenAI Codex agent (`codex exec review`) against
-  the last git commit, checks it for compliance with the workspace's `CLAUDE.md`, and
-  executes remediation if needed. Defaults to `gpt-5.5` at medium reasoning effort;
-  supports full tier control (low/medium/high/xhigh) and o-series models. Requires the
-  `codex` CLI on `PATH` and valid OpenAI auth.
+- **codex-review** — runs an external OpenAI Codex agent (`codex exec`) to review a
+  commit range against the workspace's own `CLAUDE.md`, then execute remediation if
+  needed. Reviews the last commit by default; pass `--range <rev-range>` to widen it.
+  Defaults to `gpt-5.5` at medium reasoning effort; supports full tier control
+  (low/medium/high/xhigh) and o-series models. Requires the `codex` CLI on `PATH` and
+  valid OpenAI auth.
 - **composer-review** — drives an external Cursor agent (`agent` CLI, Composer 2.5
   by default) to review a commit range against the workspace's own `CLAUDE.md`,
   then execute remediation. Reviews the last commit by default; pass `--range <rev-range>`

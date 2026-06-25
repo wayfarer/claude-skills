@@ -60,7 +60,7 @@ When this skill is invoked:
 
 **1. Ensure scripts are executable** (idempotent)
 ```bash
-chmod +x "$SKILL_DIR"/scripts/resolve-model.sh "$SKILL_DIR"/scripts/composer-plan.sh "$SKILL_DIR"/scripts/composer-execute.sh
+chmod +x "$SKILL_DIR"/scripts/resolve-model.sh "$SKILL_DIR"/scripts/composer-plan.sh "$SKILL_DIR"/scripts/composer-execute.sh "$SKILL_DIR"/scripts/validate-range.sh
 ```
 
 **2. Split off `--range`, then resolve the model**
@@ -75,7 +75,14 @@ MODEL=$("$SKILL_DIR"/scripts/resolve-model.sh "$ARGS")
 If `resolve-model.sh` exits 1, stop and show its error message to the user — do not
 proceed.
 
-**3. Run the plan harness as a background task**
+**3. Validate the range** (fail fast before the slow agent run)
+```bash
+"$SKILL_DIR"/scripts/validate-range.sh "$PWD" "$RANGE"
+```
+If `validate-range.sh` exits 1, stop and show its error message to the user — do not
+launch the background plan task.
+
+**4. Run the plan harness as a background task**
 
 Pick a deterministic output path and launch `composer-plan.sh` into it via the Bash tool
 with `run_in_background: true`:
@@ -96,7 +103,7 @@ cat "$OUTPUT_FILE"
 
 If the task exited non-zero, stop and show the output to the user — do not proceed.
 
-**4. Parse the chat ID and verdict**
+**5. Parse the chat ID and verdict**
 ```bash
 CHAT_ID=$(grep "^CHAT_ID:" "$OUTPUT_FILE" | head -1 | awk '{print $2}')
 VERDICT=$(grep "^PLAN_NEEDED:" "$OUTPUT_FILE" | head -1 | awk '{print $2}')
@@ -105,7 +112,7 @@ VERDICT=$(grep "^PLAN_NEEDED:" "$OUTPUT_FILE" | head -1 | awk '{print $2}')
 If either value is empty, or `VERDICT` is neither `yes` nor `no`, stop and show the
 output to the user — do not run the execute harness.
 
-**5. Branch on verdict**
+**6. Branch on verdict**
 
 If `VERDICT` is `yes`:
 ```bash
@@ -119,6 +126,8 @@ the agent's output. Do not run the execute harness.
 
 - The model and `--range` are the only knobs. There is no env-var override — use the
   arguments. `--range` defaults to the last commit (`HEAD~1..HEAD`).
+- The range is validated with git up front (`validate-range.sh`), so a typo'd range fails
+  fast in-session instead of after a 5–20 minute agent run.
 - The skill reviews against the **workspace's** `CLAUDE.md`, so it stays calibrated by
   whatever standards that project documents. Keep `CLAUDE.md` current.
 - Both harnesses use `--yolo` for full tool access. The plan phase needs `--yolo` so
