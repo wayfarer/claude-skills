@@ -1,3 +1,8 @@
+---
+name: codex-review
+description: Review a git commit range with an external OpenAI Codex agent (gpt-5.5 at medium reasoning effort by default) against the workspace's CLAUDE.md standards, then apply fixes if needed. Usage: /codex-review [model] [--range <rev-range>].
+---
+
 # Codex Review
 
 Run an external OpenAI Codex agent against the last git commit (or any commit range):
@@ -27,7 +32,8 @@ effort. Accepts semantic names — spacing and case are normalized before resolu
 | `o4` | `o4` (intrinsic reasoning) |
 | `o3-mini` | `o3-mini` (intrinsic reasoning) |
 
-Any full model ID is also accepted verbatim.
+Any full model ID or `MODEL:EFFORT` spec is also accepted verbatim (the resolver prints
+a `WARNING` to stderr when it passes a value through unrecognized, so typos surface).
 
 Reasoning effort (`low`/`medium`/`high`/`xhigh`) is passed to the Codex CLI as
 `-c model_reasoning_effort=<tier>`. o-series models manage their own reasoning depth
@@ -117,9 +123,13 @@ cat "$OUTPUT_FILE"
 If the task exited non-zero, stop and show the output to the user — do not proceed.
 
 **5. Parse the review file path and verdict**
+
+Parse the verdict from the review file, not from `$OUTPUT_FILE` — `codex exec` echoes
+the prompt into its transcript, and the prompt itself contains `PLAN_NEEDED:` lines.
+The review file holds only the agent's final message.
 ```bash
 REVIEW_FILE=$(grep "^REVIEW_FILE:" "$OUTPUT_FILE" | head -1 | awk '{print $2}')
-VERDICT=$(grep "^PLAN_NEEDED:" "$OUTPUT_FILE" | head -1 | awk '{print $2}')
+VERDICT=$(grep "^PLAN_NEEDED:" "$REVIEW_FILE" | head -1 | awk '{print $2}')
 ```
 
 If either value is empty, or `VERDICT` is neither `yes` nor `no`, stop and show the
@@ -143,6 +153,9 @@ the agent's output. Do not run the execute harness.
   fast in-session instead of after a 5–20 minute agent run.
 - The skill reviews against the **workspace's** `CLAUDE.md`, so it stays calibrated by
   whatever standards that project documents. Keep `CLAUDE.md` current.
+- Bare GPT family names default to `medium` reasoning effort here, whereas
+  `/composer-review` defaults to Cursor's `high` tier. The divergence is intentional —
+  each skill follows its own CLI's idiom.
 - The plan harness uses `codex exec -s read-only` (file writes are sandboxed out while
   reads and `git diff`/`git log` are allowed); the execute harness uses
   `-s workspace-write` for full file access.

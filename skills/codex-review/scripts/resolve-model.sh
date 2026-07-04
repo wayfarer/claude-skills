@@ -49,8 +49,10 @@ case "$normalized" in
   "o4")       echo "o4" ;;
   "o3-mini"|"o3mini")  echo "o3-mini" ;;
 
-  # Pass-through: already looks like a full model ID or model:effort spec
+  # Pass-through: already looks like a full model ID or model:effort spec — trust it,
+  # but warn on stderr so typos surface (stdout must stay exactly the resolved spec).
   *"."*|*"-"*"-"*|*":"*)
+    echo "WARNING: '${input}' is not a known alias; passing through verbatim." >&2
     echo "$normalized" ;;
 
   *)

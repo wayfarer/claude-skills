@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Harness: apply the remediation plan produced by codex-plan.sh.
-# The review file is piped into codex exec via stdin so the agent has full context.
+# The review file's contents are embedded in the prompt so the agent has full context.
 # Usage: codex-execute.sh <review-file> [workspace-path] [model-spec]
 # model-spec is MODEL_ID or MODEL_ID:EFFORT (e.g. gpt-5.5:high)
 

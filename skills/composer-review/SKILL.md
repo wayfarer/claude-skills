@@ -1,3 +1,8 @@
+---
+name: composer-review
+description: Review a git commit range with an external Cursor agent (Composer 2.5 by default) against the workspace's CLAUDE.md standards, then apply fixes in the same chat session if needed. Usage: /composer-review [model] [--range <rev-range>].
+---
+
 # Composer Review
 
 Run an external Cursor agent (Composer 2.5 by default) against the last git commit:
@@ -21,7 +26,8 @@ names — spacing and case are normalized before resolution:
 | `Fable 5` | `claude-fable-5-high` |
 | `Sonnet 4.6` | `claude-4.6-sonnet-medium` |
 
-A bare family name (e.g. `GPT 5.5`) defaults to the `high` tier. Run `agent models`
+Bare GPT and Opus/Fable family names default to the `high` tier; Sonnet's canonical
+tier is `medium`. Run `agent models`
 to see all valid IDs; any full ID is also accepted verbatim (the resolver prints a
 `WARNING` to stderr when it passes a value through unrecognized, so typos surface).
 
@@ -32,13 +38,16 @@ revision range and defaults to `HEAD~1..HEAD` (the last commit). Example:
 
 ## How it works
 
-Three scripts live under this skill's `scripts/` directory. Reference them by this
+Four scripts live under this skill's `scripts/` directory. Reference them by this
 skill's base directory (shown in the invocation header as
 `Base directory for this skill: <SKILL_DIR>`), not by a project-relative path. Let
 `SKILL_DIR` be that base directory.
 
 - **`resolve-model.sh [semantic-name]`** — normalizes the model argument to a canonical
   `agent --model` ID. Called once; the resolved ID is passed to both harnesses.
+- **`validate-range.sh [workspace] [rev-range]`** — checks that the range is a valid git
+  range before the slow agent run, so a typo fails fast in-session. Exits 1 with an error
+  on a bad range.
 - **`composer-plan.sh [workspace] [model-id] [rev-range]`** — creates a dedicated chat
   session, then runs `agent --print --yolo --trust --resume <chat-id> --model <model-id>`.
   The plan prompt instructs the agent to read the workspace's `CLAUDE.md` (and any file it
@@ -130,6 +139,9 @@ the agent's output. Do not run the execute harness.
   fast in-session instead of after a 5–20 minute agent run.
 - The skill reviews against the **workspace's** `CLAUDE.md`, so it stays calibrated by
   whatever standards that project documents. Keep `CLAUDE.md` current.
+- Bare GPT family names default to the `high` tier here (Cursor ships tiered model IDs),
+  whereas `/codex-review` defaults to `medium` reasoning effort. The divergence is
+  intentional — each skill follows its own CLI's idiom.
 - Both harnesses use `--yolo` for full tool access. The plan phase needs `--yolo` so
   read-only commands like `git log` and file reads are not blocked; review-only intent
   is enforced by the prompt, not by tool gating.
