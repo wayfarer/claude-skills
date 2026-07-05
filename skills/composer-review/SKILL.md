@@ -24,10 +24,11 @@ names — spacing and case are normalized before resolution:
 | `GPT 5.5 medium` | `gpt-5.5-medium` |
 | `Opus 4.8` | `claude-opus-4-8-high` |
 | `Fable 5` | `claude-fable-5-high` |
-| `Sonnet 4.6` | `claude-4.6-sonnet-medium` |
+| `Sonnet 5` | `claude-sonnet-5-high` |
 
-Bare GPT and Opus/Fable family names default to the `high` tier; Sonnet's canonical
-tier is `medium`. Run `agent models`
+Bare GPT, Opus/Fable, and Sonnet family names default to the `high` tier (`Sonnet 5`
+maps to Cursor's canonical "Sonnet 5 1M"). Explicit `Sonnet 4.6` still resolves to the
+previous-generation `claude-4.6-sonnet-medium`. Run `agent models`
 to see all valid IDs; any full ID is also accepted verbatim (the resolver prints a
 `WARNING` to stderr when it passes a value through unrecognized, so typos surface).
 

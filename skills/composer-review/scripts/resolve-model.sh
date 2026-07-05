@@ -51,8 +51,14 @@ case "$normalized" in
   "fable-5-thinking"|"fable-5-think")
     echo "claude-fable-5-thinking-high" ;;
 
-  # Claude Sonnet 4.6
-  "sonnet-4.6"|"sonnet4.6"|"claude-4.6-sonnet"|"sonnet")
+  # Claude Sonnet 5 — default tier: high (Cursor's canonical "Sonnet 5 1M")
+  "sonnet-5"|"sonnet5"|"claude-sonnet-5"|"sonnet")
+    echo "claude-sonnet-5-high" ;;
+  "sonnet-5-thinking"|"sonnet-5-think")
+    echo "claude-sonnet-5-thinking-high" ;;
+
+  # Claude Sonnet 4.6 (previous generation)
+  "sonnet-4.6"|"sonnet4.6"|"claude-4.6-sonnet")
     echo "claude-4.6-sonnet-medium" ;;
   "sonnet-4.6-thinking"|"sonnet-4.6-think")
     echo "claude-4.6-sonnet-medium-thinking" ;;
