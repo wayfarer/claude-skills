@@ -1,6 +1,6 @@
 ---
 name: codex-review
-description: Review a git commit range with an external OpenAI Codex agent (gpt-5.5 at medium reasoning effort by default) against the workspace's CLAUDE.md standards, then apply fixes if needed. Usage: /codex-review [model] [--range <rev-range>].
+description: Review a git commit range with an external OpenAI Codex agent (gpt-5.6-sol at medium reasoning effort by default) against the workspace's CLAUDE.md standards, then apply fixes if needed. Usage: /codex-review [model] [--range <rev-range>].
 ---
 
 # Codex Review
@@ -13,12 +13,19 @@ remediation if needed. Works in any workspace that has a `CLAUDE.md`.
 
 `/codex-review [model] [--range <rev-range>]`
 
-`[model]` is optional. With no argument, defaults to `gpt-5.5` at medium reasoning
+`[model]` is optional. With no argument, defaults to `gpt-5.6-sol` at medium reasoning
 effort. Accepts semantic names — spacing and case are normalized before resolution:
 
 | You type | Resolves to |
 |---|---|
-| *(omitted)* | `gpt-5.5` @ medium effort |
+| *(omitted)* | `gpt-5.6-sol` @ medium effort |
+| `gpt-5.6` or `sol` | `gpt-5.6-sol` @ medium |
+| `gpt-5.6 high` / `sol high` | `gpt-5.6-sol` @ high |
+| `sol max` | `gpt-5.6-sol` @ max |
+| `terra` | `gpt-5.6-terra` @ medium |
+| `terra low` / `medium` / `high` / `xhigh` / `max` | `gpt-5.6-terra` @ that tier |
+| `luna` | `gpt-5.6-luna` @ medium |
+| `luna low` / `medium` / `high` / `xhigh` / `max` | `gpt-5.6-luna` @ that tier |
 | `gpt-5.5` | `gpt-5.5` @ medium |
 | `gpt-5.5 low` | `gpt-5.5` @ low |
 | `gpt-5.5 high` | `gpt-5.5` @ high |
@@ -35,9 +42,9 @@ effort. Accepts semantic names — spacing and case are normalized before resolu
 Any full model ID or `MODEL:EFFORT` spec is also accepted verbatim (the resolver prints
 a `WARNING` to stderr when it passes a value through unrecognized, so typos surface).
 
-Reasoning effort (`low`/`medium`/`high`/`xhigh`) is passed to the Codex CLI as
-`-c model_reasoning_effort=<tier>`. o-series models manage their own reasoning depth
-and do not use this flag.
+Reasoning effort (`low`/`medium`/`high`/`xhigh`, plus `max` on the gpt-5.6 family) is
+passed to the Codex CLI as `-c model_reasoning_effort=<tier>`. o-series models manage
+their own reasoning depth and do not use this flag.
 
 `--range <rev-range>` is optional and selects what to review. It accepts any git
 revision range and defaults to `HEAD~1..HEAD` (the last commit). Example:
@@ -162,3 +169,10 @@ the agent's output. Do not run the execute harness.
 - The review temp file is written to `/tmp` and left in place after the run. Clean up
   with `rm /tmp/codex-review-*.md` if needed.
 - Requires the `codex` CLI on `PATH` and valid OpenAI auth (`codex login`).
+- Model availability is gated by the installed CLI version, not by this skill: each new
+  model family ships in a new Codex CLI release. The gpt-5.6 family (sol/terra/luna)
+  and the `max` effort tier require Codex CLI ≥ 0.144.0. If a model is rejected, check
+  `codex --version` and upgrade before assuming the alias table is wrong. Conversely,
+  models newer than the alias table still work today: any full model ID or
+  `MODEL:EFFORT` spec passes through verbatim (with a stderr warning), so a new release
+  is usable before this skill learns its alias.

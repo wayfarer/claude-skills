@@ -2,7 +2,7 @@
 # Harness: apply the remediation plan produced by codex-plan.sh.
 # The review file's contents are embedded in the prompt so the agent has full context.
 # Usage: codex-execute.sh <review-file> [workspace-path] [model-spec]
-# model-spec is MODEL_ID or MODEL_ID:EFFORT (e.g. gpt-5.5:high)
+# model-spec is MODEL_ID or MODEL_ID:EFFORT (e.g. gpt-5.6-sol:high)
 
 set -euo pipefail
 
@@ -13,7 +13,7 @@ fi
 
 REVIEW_FILE="$1"
 WORKSPACE="${2:-$(pwd)}"
-MODEL_SPEC="${3:-gpt-5.5:medium}"
+MODEL_SPEC="${3:-gpt-5.6-sol:medium}"
 
 # Parse model spec: split on : into model ID and optional reasoning effort
 if [[ "$MODEL_SPEC" == *:* ]]; then

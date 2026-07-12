@@ -10,12 +10,12 @@
 #   REVIEW_FILE: <path>     (first line, emitted by this script)
 #   PLAN_NEEDED: yes|no     (from the agent, first line of the captured review)
 # Usage: codex-plan.sh [workspace-path] [model-spec] [rev-range]
-# model-spec is MODEL_ID or MODEL_ID:EFFORT (e.g. gpt-5.5:high)
+# model-spec is MODEL_ID or MODEL_ID:EFFORT (e.g. gpt-5.6-sol:high)
 
 set -euo pipefail
 
 WORKSPACE="${1:-$(pwd)}"
-MODEL_SPEC="${2:-gpt-5.5:medium}"
+MODEL_SPEC="${2:-gpt-5.6-sol:medium}"
 RANGE="${3:-HEAD~1..HEAD}"
 
 # Root-commit safety: the default range references HEAD~1, which does not exist when

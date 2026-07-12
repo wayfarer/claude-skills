@@ -21,9 +21,10 @@ here is globally available. To add a skill, create `skills/<name>/SKILL.md`
 - **codex-review** — runs an external OpenAI Codex agent (`codex exec`) to review a
   commit range against the workspace's own `CLAUDE.md`, then execute remediation if
   needed. Reviews the last commit by default; pass `--range <rev-range>` to widen it.
-  Defaults to `gpt-5.5` at medium reasoning effort; supports full tier control
-  (low/medium/high/xhigh) and o-series models. Requires the `codex` CLI on `PATH` and
-  valid OpenAI auth.
+  Defaults to `gpt-5.6-sol` at medium reasoning effort; supports the full gpt-5.6
+  family (sol/terra/luna) with full tier control (low/medium/high/xhigh/max), earlier
+  GPT-5.x models, and o-series models. Requires the `codex` CLI on `PATH` (≥ 0.144.0
+  for gpt-5.6) and valid OpenAI auth.
 - **composer-review** — drives an external Cursor agent (`agent` CLI, Composer 2.5
   by default) to review a commit range against the workspace's own `CLAUDE.md`,
   then execute remediation. Reviews the last commit by default; pass `--range <rev-range>`
