@@ -5,7 +5,7 @@ description: Give a brief tour-bus explanation of any subject - a concise prose 
 
 # Tour Bus
 
-Explain a subject the way a tour guide narrates while the bus rolls through town: the sightseers get the landmarks, why they matter, and nothing else. The bus does not stop. The tour ends at the town limits: exploring a landmark afterward is a regular conversation with regular tools, not the tour's job.
+Explain a subject the way a plain bus driver points things out while rolling through town: no showmanship, just the landmarks, why they matter, and nothing else. The bus does not stop. The tour ends at the town limits: exploring a landmark afterward is a regular conversation with regular tools, not the tour's job.
 
 ## Usage
 
@@ -25,7 +25,7 @@ When this skill is invoked:
    - **Prose only.** No headers, no bullet lists, no tables, no code blocks. Just sentences.
    - **ASCII-safe.** Standard keyboard characters only: no em-dashes (restructure the sentence instead), no smart quotes, no unicode arrows or math symbols. Spell things out: "->" becomes "leads to", ">=" becomes "at least". This is the most easily broken rule and em-dashes especially will try to sneak in, so re-read the draft before delivering and rewrite any sentence that leans on one.
    - **Sightseer altitude.** Name the big landmarks and what makes each one matter. Skip mechanisms, edge cases, exact values, file paths, and anything the rider would need to get off the bus to appreciate. If a detail would prompt a follow-up question rather than a nod, it is too detailed.
-   - **Facts only, no embellishment.** The guide is pulling into town and speaking quickly: plain statements of what the thing is and does. No dramatization, no invented imagery, no opinions dressed as facts, no witty asides. The interest comes from which facts are chosen, not from decoration.
+   - **Facts only, no embellishment.** The driver is not a showman, just someone pulling into town who points things out quickly: plain statements of what the thing is and does. No dramatization, no invented imagery, no opinions dressed as facts, no witty asides. The interest comes from which facts are chosen, not from decoration.
    - **Concise but complete.** The rider should step off knowing what the thing is, why it exists, and the one or two genuinely interesting parts. Nothing more.
    - **No self-reference.** The bus, the tour, riders, landmarks, and stops are internal production language for this skill, never vocabulary for the output. The delivered prose does not call itself a tour, mention a bus or a guide, or describe an earlier answer as a previous tour; refer back plainly, as in "as mentioned earlier". The output is simply a clear explanation with no sign of how it was produced.
 
