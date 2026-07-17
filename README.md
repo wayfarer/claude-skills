@@ -33,7 +33,8 @@ here is globally available. To add a skill, create `skills/<name>/SKILL.md`
   for the remainder of a conversation.
 - **tour-bus** — gives a brief "tour bus" explanation of any subject: one or two
   paragraphs of plain prose at sightseer altitude, grounded in the current
-  conversation when relevant. Usage: `/tour-bus <subject or question>`.
+  conversation when relevant. Repeat calls can name a landmark from a previous
+  tour to zoom into it. Usage: `/tour-bus <subject or question>`.
 
 ## Setup on a new machine
 
