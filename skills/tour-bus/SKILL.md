@@ -21,7 +21,7 @@ When this skill is invoked:
 
 2. **Follow-up stops.** If the subject names a landmark from a tour given earlier in this conversation, the rider has hopped back on for a closer loop: give a fresh tour zoomed to that landmark, at the same altitude, in the same format, at the same length. Do not advertise this option in tour output; it simply works when used.
 
-3. **Write the tour.** One paragraph, two at most, roughly 3-8 sentences total. It must be:
+3. **Write the tour.** Roughly 3-8 sentences total, broken into short paragraphs: never more than 2-3 sentences per paragraph, so one to three paragraphs in all. It must be:
    - **Prose only.** No headers, no bullet lists, no tables, no code blocks. Just sentences.
    - **ASCII-safe.** Standard keyboard characters only: no em-dashes (restructure the sentence instead), no smart quotes, no unicode arrows or math symbols. Spell things out: "->" becomes "leads to", ">=" becomes "at least". This is the most easily broken rule and em-dashes especially will try to sneak in, so re-read the draft before delivering and rewrite any sentence that leans on one.
    - **Sightseer altitude.** Name the big landmarks and what makes each one matter. Skip mechanisms, edge cases, exact values, file paths, and anything the rider would need to get off the bus to appreciate. If a detail would prompt a follow-up question rather than a nod, it is too detailed.
