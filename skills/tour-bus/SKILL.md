@@ -26,6 +26,7 @@ When this skill is invoked:
    - **ASCII-safe.** Standard keyboard characters only: no em-dashes (restructure the sentence instead), no smart quotes, no unicode arrows or math symbols. Spell things out: "->" becomes "leads to", ">=" becomes "at least". This is the most easily broken rule and em-dashes especially will try to sneak in, so re-read the draft before delivering and rewrite any sentence that leans on one.
    - **Sightseer altitude.** Name the big landmarks and what makes each one matter. Skip mechanisms, edge cases, exact values, file paths, and anything the rider would need to get off the bus to appreciate. If a detail would prompt a follow-up question rather than a nod, it is too detailed.
    - **Concise but complete.** The rider should step off knowing what the thing is, why it exists, and the one or two genuinely interesting parts. Nothing more.
+   - **No self-reference.** The bus, the tour, riders, landmarks, and stops are internal production language for this skill, never vocabulary for the output. The delivered prose does not call itself a tour, mention a bus or a guide, or describe an earlier answer as a previous tour; refer back plainly, as in "as mentioned earlier". The output is simply a clear explanation with no sign of how it was produced.
 
 4. **No tools.** Answer directly from context and knowledge. Do not open files, run searches, or spawn agents to research the subject; the tour covers what is already visible from the bus.
 
