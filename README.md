@@ -31,6 +31,9 @@ here is globally available. To add a skill, create `skills/<name>/SKILL.md`
   to widen it. Project-agnostic: it reads whatever standards the current project documents.
 - **subagent-model** — sets the model used for subagents spawned via the Agent tool
   for the remainder of a conversation.
+- **tour-bus** — gives a brief "tour bus" explanation of any subject: one or two
+  paragraphs of plain prose at sightseer altitude, grounded in the current
+  conversation when relevant. Usage: `/tour-bus <subject or question>`.
 
 ## Setup on a new machine
 
