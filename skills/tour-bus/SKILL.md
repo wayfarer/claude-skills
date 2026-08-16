@@ -1,6 +1,6 @@
 ---
 name: tour-bus
-description: Give a brief tour-bus explanation of any subject - a concise prose guide at sightseer altitude, grounded in the current conversation when relevant. Usage: /tour-bus <subject or question>
+description: Give a brief tour-bus explanation of any subject - a concise prose guide at sightseer altitude, grounded in the current conversation when relevant. Usage: /tour-bus [--no-shrink] <subject or question>
 ---
 
 # Tour Bus
@@ -9,9 +9,9 @@ Explain a subject the way a plain bus driver points things out while rolling thr
 
 ## Usage
 
-`/tour-bus <subject or question>`
+`/tour-bus [--no-shrink] <subject or question>`
 
-The whole argument string is the subject. If no argument is given, give the tour of the main thing this conversation has been working on. If the conversation is empty or has no main thing yet, do not guess: ask in one sentence what subject the rider wants toured, since with no tools and no context there is nothing to narrate.
+`--no-shrink` is the only flag. It may appear anywhere in the argument string; strip it out first, and it turns off the shrink pass (step 4 below). Whatever remains is the subject. If no subject is given, give the tour of the main thing this conversation has been working on. If the conversation is empty or has no main thing yet, do not guess: ask in one sentence what subject the rider wants toured, since with no tools and no context there is nothing to narrate.
 
 ## Instructions
 
@@ -29,6 +29,8 @@ When this skill is invoked:
    - **Concise but complete.** The rider should step off knowing what the thing is, why it exists, and the one or two genuinely interesting parts. Nothing more.
    - **No self-reference.** The bus, the tour, riders, landmarks, and stops are internal production language for this skill, never vocabulary for the output. The delivered prose does not call itself a tour, mention a bus or a guide, or describe an earlier answer as a previous tour; refer back plainly, as in "as mentioned earlier". The output is simply a clear explanation with no sign of how it was produced.
 
-4. **No tools.** Answer directly from context and knowledge. Do not open files, run searches, or spawn agents to research the subject; the tour covers what is already visible from the bus.
+4. **Shrink pass.** Once the draft from step 3 is complete, apply exactly one follow-up instruction to it, always the same words: "Now, make it even smaller, and more concise, if possible". Treat that as a request from the rider and revise the draft accordingly, keeping every rule in step 3 in force. "If possible" means cut only what can go without losing what the rider needs to step off knowing; if nothing can, the draft stands. This is a single pass, never repeated, and it is on by default; `--no-shrink` skips it and the draft is delivered as written. The draft itself is never shown, only the version that comes out of this step.
 
-5. Deliver the tour as the response itself, with no preamble like "Here is your tour" and no closing offer to elaborate.
+5. **No tools.** Answer directly from context and knowledge. Do not open files, run searches, or spawn agents to research the subject; the tour covers what is already visible from the bus.
+
+6. Deliver the tour as the response itself, with no preamble like "Here is your tour" and no closing offer to elaborate. Do not mention that a shrink pass happened or was skipped.
