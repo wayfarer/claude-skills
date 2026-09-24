@@ -166,11 +166,14 @@ to skip it.
 
 **8. Decide**
 
-- **Accept.** Without `--commit`: `git add` the explicit reviewed paths (never `-A` or
+- **Accept.** In both modes, check `git status --short` and `git diff HEAD` for
+  remaining reviewed changes, including reviewed untracked paths, even if Codex
+  already committed. If any remain, `git add` their explicit paths (never `-A` or
   `.`), then commit with a message derived from the plan title and the workspace's
-  commit conventions. With `--commit`: nothing to do if Codex committed; if the sandbox
-  refused, commit with the proposed message from the report. Report `STATUS`, the
-  commit, and any deviations to the user.
+  commit conventions. With `--commit`, use the proposed message from the report if
+  the sandbox refused the commit; if Codex already committed, commit the remaining
+  reviewed changes as a follow-up. Confirm no reviewed changes remain uncommitted
+  before reporting `STATUS`, the commit(s), and any deviations to the user.
 - **Remediate, small** (a missed line, a convention slip, a typo): edit directly,
   re-run verification, then accept. With `--commit`, land it as a follow-up commit.
 - **Remediate, large** (a missed plan item, a wrong approach in one section): write the
@@ -199,7 +202,11 @@ to skip it.
     going on. Then `git reset --hard BASE_SHA` (drops Codex's commits and restores
     index and tree together; a soft reset would leave the rejected content staged),
     and copy the shielded files back. Pre-existing untracked files Codex never
-    committed or staged are untouched by the reset.
+    committed or staged are untouched by the reset. Then check for remaining
+    untracked paths and `rm` only explicit reviewed Codex-created paths that are
+    not in `PRE_UNTRACKED`. Preserve every path recorded in `PRE_UNTRACKED`; never
+    delete a containing directory that would remove one of those paths. Confirm no
+    rejected changes or reviewed Codex-created untracked paths remain.
 
 `STATUS: blocked`, an empty or garbled report: review the tree anyway, surface the
 `## Open questions` to the user, do not commit, and offer either a resume round with
