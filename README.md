@@ -26,6 +26,12 @@ here is globally available. To add a skill, create `skills/<name>/SKILL.md`
   full tier control (low/medium/high/xhigh/max, plus ultra where the catalog offers
   it). Requires the
   `codex` CLI on `PATH` (gpt-6-astra verified with 0.154.0) and valid OpenAI auth.
+- **codex-execute** — the inverse of codex-review: hands an approved plan (a markdown
+  file, by default this session's plan or the newest under `~/.claude/plans/`) to an
+  external OpenAI Codex agent to execute in the workspace, then Claude reviews the
+  diff against the plan and `CLAUDE.md`, remediates (directly, or by resuming the Codex
+  session with feedback), and commits. Defaults to `gpt-6-astra` at high reasoning
+  effort. Usage: `/codex-execute [model] [--plan <path>] [--commit]`.
 - **composer-review** — drives an external Cursor agent (`agent` CLI, Composer 2.5
   by default) to review a commit range against the workspace's own `CLAUDE.md`,
   then execute remediation. Reviews the last commit by default; pass `--range <rev-range>`

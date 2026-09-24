@@ -1,0 +1,1 @@
+../../codex-review/scripts/resolve-model.sh
