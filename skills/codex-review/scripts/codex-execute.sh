@@ -3,6 +3,8 @@
 # The review file's contents are embedded in the prompt so the agent has full context.
 # Usage: codex-execute.sh <review-file> [workspace-path] [model-spec]
 # model-spec is MODEL_ID or MODEL_ID:EFFORT (e.g. gpt-6-astra:high)
+# Execution runs at least at high reasoning effort: a low/medium review spec is
+# raised to high here, while xhigh/max/ultra are kept as requested.
 
 set -euo pipefail
 
@@ -13,12 +15,15 @@ fi
 
 REVIEW_FILE="$1"
 WORKSPACE="${2:-$(pwd)}"
-MODEL_SPEC="${3:-gpt-6-astra:medium}"
+MODEL_SPEC="${3:-gpt-6-astra:high}"
 
 # Parse model spec: split on : into model ID and optional reasoning effort
 if [[ "$MODEL_SPEC" == *:* ]]; then
   MODEL_ID="${MODEL_SPEC%%:*}"
   REASONING_EFFORT="${MODEL_SPEC##*:}"
+  case "$REASONING_EFFORT" in
+    low|medium) REASONING_EFFORT="high" ;;
+  esac
   EFFORT_ARGS=(-c "model_reasoning_effort=$REASONING_EFFORT")
 else
   MODEL_ID="$MODEL_SPEC"

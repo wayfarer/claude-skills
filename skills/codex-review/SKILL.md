@@ -1,6 +1,6 @@
 ---
 name: codex-review
-description: Review a git commit range with an external OpenAI Codex agent (gpt-6-astra at medium reasoning effort by default) against the workspace's CLAUDE.md standards, then apply fixes if needed. Usage: /codex-review [model] [--range <rev-range>].
+description: Review a git commit range with an external OpenAI Codex agent (gpt-6-astra by default: medium reasoning effort for the review, high for applying fixes) against the workspace's CLAUDE.md standards, then apply fixes if needed. Usage: /codex-review [model] [--range <rev-range>].
 ---
 
 # Codex Review
@@ -41,6 +41,11 @@ tiers a model accepts come from the catalog the CLI reports (`codex debug models
 stops at `xhigh`. Bare names resolve to `medium` here even where the CLI's own default
 differs (the catalog defaults Astra to `low`), so every alias in the table behaves the same.
 
+The resolved tier governs the review phase. The execute phase runs at least at `high`:
+a `low` or `medium` spec is raised to `high` when fixes are applied, while `xhigh`,
+`max` and `ultra` are kept as requested. Reviewing is cheap to get slightly wrong and
+easy to re-run; applying edits is not.
+
 `--range <rev-range>` is optional and selects what to review. It accepts any git
 revision range and defaults to `HEAD~1..HEAD` (the last commit). Example:
 `/codex-review --range main..HEAD` reviews everything on the current branch since
@@ -67,7 +72,8 @@ skill's base directory (shown in the invocation header as
   script), followed by the captured review.
 - **`codex-execute.sh <review-file> [workspace] [model-spec]`** — runs
   `codex exec -s workspace-write` with the review output embedded in the prompt, so the
-  agent has full context to apply fixes and commit.
+  agent has full context to apply fixes and commit. Floors the reasoning effort at
+  `high` (see above).
 
 Unlike Cursor Composer, Codex exec is one-shot (no `--resume` sessions). The two
 phases communicate through the temp file written by the plan harness. Each invocation
@@ -155,8 +161,9 @@ the agent's output. Do not run the execute harness.
   fast in-session instead of after a 5–20 minute agent run.
 - The skill reviews against the **workspace's** `CLAUDE.md`, so it stays calibrated by
   whatever standards that project documents. Keep `CLAUDE.md` current.
-- Bare GPT family names default to `medium` reasoning effort here, whereas
-  `/composer-review` defaults to Cursor's `high` tier. The divergence is intentional —
+- Bare GPT family names default to `medium` reasoning effort for the review here
+  (execution is floored at `high`), whereas `/composer-review` defaults to Cursor's
+  `high` tier throughout. The divergence is intentional —
   each skill follows its own CLI's idiom.
 - The plan harness uses `codex exec -s read-only` (file writes are sandboxed out while
   reads and `git diff`/`git log` are allowed); the execute harness uses
