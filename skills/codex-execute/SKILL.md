@@ -72,11 +72,20 @@ chmod +x "$SKILL_DIR"/scripts/resolve-plan.sh "$SKILL_DIR"/scripts/check-workspa
 ```
 
 **2. Split off `--plan` and `--commit`, then resolve the model**
+`$ARGUMENTS` is a plain string. A plan path may contain spaces, so a double-quoted
+value is taken whole; an unquoted value runs to the next space.
 ```bash
 ARGS="$ARGUMENTS"; PLAN_ARG=""; COMMIT_FLAG=""
-if [[ "$ARGS" == *"--plan"* ]]; then
-  PLAN_ARG=$(echo "$ARGS" | sed -E 's/.*--plan[= ]+([^ ]+).*/\1/')
-  ARGS=$(echo "$ARGS" | sed -E 's/--plan[= ]+[^ ]+//')
+case "$ARGS" in
+  *--plan[=\ ]\"*)
+    PLAN_ARG=$(echo "$ARGS" | sed -E 's/.*--plan[= ]+"([^"]*)".*/\1/')
+    ARGS=$(echo "$ARGS" | sed -E 's/--plan[= ]+"[^"]*"//') ;;
+  *--plan*)
+    PLAN_ARG=$(echo "$ARGS" | sed -E 's/.*--plan[= ]+([^ ]+).*/\1/')
+    ARGS=$(echo "$ARGS" | sed -E 's/--plan[= ]+[^ ]+//') ;;
+esac
+if [[ "$PLAN_ARG" == *"--plan"* || "$PLAN_ARG" == "--commit" ]]; then
+  echo "ERROR: --plan requires a path" >&2   # no value followed --plan
 fi
 if [[ "$ARGS" == *"--commit"* ]]; then
   COMMIT_FLAG="--commit"
@@ -84,7 +93,9 @@ if [[ "$ARGS" == *"--commit"* ]]; then
 fi
 MODEL=$("$SKILL_DIR"/scripts/resolve-model.sh "$ARGS")
 ```
-If `resolve-model.sh` exits 1, stop and show its error message to the user.
+If `--plan` had no value, or `resolve-model.sh` exits 1, stop and show the error to
+the user. If the arguments are quoted in some other way, extract the path by
+inspection rather than forcing them through the snippet.
 
 **3. Resolve the plan**
 
@@ -134,12 +145,15 @@ to skip it.
 
 **7. Review the work** (Claude is the decider)
 
-- `git status --short`, `git diff --stat`, `git diff`. Untracked paths that are not in
-  `PRE_UNTRACKED` were created by Codex.
+- `git status --short`, then `git diff HEAD --stat` and `git diff HEAD`. Diff against
+  `HEAD`, not the plain `git diff`: Codex was told not to stage, but if it did, the
+  plain form would hide those changes. Untracked paths that are not in `PRE_UNTRACKED`
+  were created by Codex; they do not appear in any diff, so read each one in full.
 - Without `--commit`: confirm `git rev-parse HEAD` still equals `BASE_SHA`. If it does
   not, Codex committed despite instructions; report that, review with
-  `git diff BASE_SHA..HEAD`, and only `git reset --soft BASE_SHA` with the user's
-  explicit confirmation.
+  `git diff BASE_SHA..HEAD`, and treat the rest of the review as `--commit` mode. To
+  keep the changes but undo the commit, `git reset --soft BASE_SHA` with the user's
+  explicit confirmation; to discard them, use the `--commit` reject path.
 - With `--commit`: expect HEAD to have advanced. Review with `git diff BASE_SHA..HEAD`
   and `git log BASE_SHA..HEAD`. If HEAD did not move, the sandbox refused the commit;
   the report should carry a `## Proposed commit message` section.
@@ -172,9 +186,12 @@ to skip it.
   to writing a short remediation plan and running `codex-run.sh` on it, or fixing
   directly.
 - **Reject.** Show the user the diff summary and the reason. Revert only after their
-  explicit confirmation: `git checkout -- <tracked paths>` and `rm` only the
-  Codex-created untracked paths (never pre-existing ones). With `--commit`,
-  `git reset --soft BASE_SHA` first.
+  explicit confirmation. Without `--commit`: `git checkout HEAD -- <tracked paths>`
+  (restores index and working tree from `HEAD`, so a staged change is undone too) and
+  `rm` only the Codex-created untracked paths, never pre-existing ones. With
+  `--commit`: `git reset --hard BASE_SHA`, which drops Codex's commits and restores
+  index and tree together; a soft reset would leave the rejected content staged.
+  `reset --hard` leaves untracked files alone, so pre-existing ones survive.
 
 `STATUS: blocked`, an empty or garbled report: review the tree anyway, surface the
 `## Open questions` to the user, do not commit, and offer either a resume round with
