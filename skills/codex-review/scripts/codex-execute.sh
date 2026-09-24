@@ -27,7 +27,7 @@ if [[ "$MODEL_SPEC" == *:* ]]; then
   EFFORT_ARGS=(-c "model_reasoning_effort=$REASONING_EFFORT")
 else
   MODEL_ID="$MODEL_SPEC"
-  EFFORT_ARGS=()
+  EFFORT_ARGS=(-c "model_reasoning_effort=high")
 fi
 
 if [[ ! -f "$REVIEW_FILE" ]]; then

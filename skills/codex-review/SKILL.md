@@ -1,6 +1,7 @@
 ---
 name: codex-review
-description: Review a git commit range with an external OpenAI Codex agent (gpt-6-astra by default: medium reasoning effort for the review, high for applying fixes) against the workspace's CLAUDE.md standards, then apply fixes if needed. Usage: /codex-review [model] [--range <rev-range>].
+description: >-
+  Review a git commit range with an external OpenAI Codex agent (gpt-6-astra by default: medium reasoning effort for the review, high for applying fixes) against the workspace's CLAUDE.md standards, then apply fixes if needed. Usage: /codex-review [model] [--range <rev-range>].
 ---
 
 # Codex Review
