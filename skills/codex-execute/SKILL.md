@@ -192,12 +192,14 @@ to skip it.
     tree was clean before the run, so this unstages only Codex's work. Then
     `git checkout -- <modified tracked paths>` and `rm` the Codex-created untracked
     paths, meaning every untracked path not in `PRE_UNTRACKED`.
-  - With `--commit`: list `git diff --name-only BASE_SHA..HEAD`. Any of those paths
-    that is also in `PRE_UNTRACKED` was a pre-existing file Codex committed; copy each
-    one aside before the reset. Then `git reset --hard BASE_SHA` (drops Codex's commits
-    and restores index and tree together; a soft reset would leave the rejected
-    content staged), and copy the shielded files back. Pre-existing untracked files
-    that Codex never committed are untouched by the reset.
+  - With `--commit`: list `git diff --name-only BASE_SHA` (working tree and index
+    against the baseline, so it covers files Codex committed and files it only
+    staged). Any of those paths that is also in `PRE_UNTRACKED` is a pre-existing file
+    a hard reset would delete; copy each one aside and confirm the copy exists before
+    going on. Then `git reset --hard BASE_SHA` (drops Codex's commits and restores
+    index and tree together; a soft reset would leave the rejected content staged),
+    and copy the shielded files back. Pre-existing untracked files Codex never
+    committed or staged are untouched by the reset.
 
 `STATUS: blocked`, an empty or garbled report: review the tree anyway, surface the
 `## Open questions` to the user, do not commit, and offer either a resume round with
