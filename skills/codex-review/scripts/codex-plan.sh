@@ -35,7 +35,14 @@ else
   EFFORT_ARGS=()
 fi
 
-REVIEW_FILE=$(mktemp /tmp/codex-review-XXXXXX.md)
+# BSD mktemp (macOS) only substitutes Xs at the END of a template, so a
+# trailing ".md" makes it treat the whole path as a literal name — which then
+# fails with "File exists" on every run after the first. Create the file with
+# the Xs last, then add the suffix. GNU mktemp is happy with this too, and the
+# `/tmp/codex-review-*.md` cleanup glob still matches.
+REVIEW_FILE=$(mktemp /tmp/codex-review-XXXXXX)
+mv "$REVIEW_FILE" "$REVIEW_FILE.md"
+REVIEW_FILE="$REVIEW_FILE.md"
 echo "REVIEW_FILE: $REVIEW_FILE"
 
 # Note: read -r -d '' (not $(cat <<EOF)) because macOS bash 3.2 mis-parses a
