@@ -2,8 +2,12 @@
 # Resolve a semantic model name to a canonical codex CLI model spec.
 # Output is MODEL_ID or MODEL_ID:EFFORT (colon-separated when effort applies).
 # Usage: resolve-model.sh [semantic-name]
-# With no argument, prints the default: gpt-5.6-sol:medium
+# With no argument, prints the default: gpt-6-astra:medium
 # Exits 1 and prints an error if the input is unrecognized.
+#
+# The alias table mirrors the catalog the installed CLI reports via
+# `codex debug models` (Codex CLI 0.154.0, 2026-09-24). Hidden catalog entries
+# (gpt-reserve, codex-auto-review) are deliberately not aliased.
 
 set -euo pipefail
 
@@ -13,8 +17,21 @@ input="${*:-}"
 normalized=$(echo "$input" | tr '[:upper:]' '[:lower:]' | tr -s ' \t' '-' | sed 's/^-*//;s/-*$//')
 
 case "$normalized" in
-  # Default / GPT-5.6 Sol bare — medium effort
-  ""|"gpt-5.6"|"gpt5.6"|"gpt-5-6"|"sol"|"gpt-5.6-sol"|"gpt5.6-sol")
+  # Default / GPT-6 Astra bare — medium effort
+  ""|"astra"|"gpt-6"|"gpt6"|"gpt-6-astra"|"gpt6-astra")
+    echo "gpt-6-astra:medium" ;;
+
+  # GPT-6 Astra with explicit tier
+  "astra-low"|"gpt-6-low"|"gpt6-low"|"gpt-6-astra-low")                 echo "gpt-6-astra:low" ;;
+  "astra-medium"|"gpt-6-medium"|"gpt6-medium"|"gpt-6-astra-medium")     echo "gpt-6-astra:medium" ;;
+  "astra-high"|"gpt-6-high"|"gpt6-high"|"gpt-6-astra-high")             echo "gpt-6-astra:high" ;;
+  "astra-xhigh"|"astra-extra-high"|"gpt-6-xhigh"|"gpt-6-extra-high"|"gpt6-xhigh"|"gpt-6-astra-xhigh"|"gpt-6-astra-extra-high")
+    echo "gpt-6-astra:xhigh" ;;
+  "astra-max"|"gpt-6-max"|"gpt6-max"|"gpt-6-astra-max")                 echo "gpt-6-astra:max" ;;
+  "astra-ultra"|"gpt-6-ultra"|"gpt6-ultra"|"gpt-6-astra-ultra")         echo "gpt-6-astra:ultra" ;;
+
+  # GPT-5.6 Sol bare — medium effort
+  "gpt-5.6"|"gpt5.6"|"gpt-5-6"|"sol"|"gpt-5.6-sol"|"gpt5.6-sol")
     echo "gpt-5.6-sol:medium" ;;
 
   # GPT-5.6 Sol with explicit tier
@@ -24,6 +41,7 @@ case "$normalized" in
   "gpt-5.6-xhigh"|"gpt-5.6-extra-high"|"gpt5.6-xhigh"|"sol-xhigh"|"gpt-5.6-sol-xhigh"|"gpt-5.6-sol-extra-high")
     echo "gpt-5.6-sol:xhigh" ;;
   "gpt-5.6-max"|"gpt5.6-max"|"sol-max"|"gpt-5.6-sol-max")             echo "gpt-5.6-sol:max" ;;
+  "gpt-5.6-ultra"|"gpt5.6-ultra"|"sol-ultra"|"gpt-5.6-sol-ultra")     echo "gpt-5.6-sol:ultra" ;;
 
   # GPT-5.6 Terra — medium effort
   "terra"|"gpt-5.6-terra"|"gpt5.6-terra")
@@ -36,8 +54,9 @@ case "$normalized" in
   "terra-xhigh"|"terra-extra-high"|"gpt-5.6-terra-xhigh"|"gpt-5.6-terra-extra-high")
     echo "gpt-5.6-terra:xhigh" ;;
   "terra-max"|"gpt-5.6-terra-max")          echo "gpt-5.6-terra:max" ;;
+  "terra-ultra"|"gpt-5.6-terra-ultra")      echo "gpt-5.6-terra:ultra" ;;
 
-  # GPT-5.6 Luna — medium effort
+  # GPT-5.6 Luna — medium effort (no ultra tier in the catalog)
   "luna"|"gpt-5.6-luna"|"gpt5.6-luna")
     echo "gpt-5.6-luna:medium" ;;
 
@@ -49,41 +68,16 @@ case "$normalized" in
     echo "gpt-5.6-luna:xhigh" ;;
   "luna-max"|"gpt-5.6-luna-max")            echo "gpt-5.6-luna:max" ;;
 
-  # GPT-5.5 bare — medium effort
+  # GPT-5.5 (legacy) bare — medium effort
   "gpt-5.5"|"gpt5.5"|"gpt-5-5")
     echo "gpt-5.5:medium" ;;
 
-  # GPT-5.5 with explicit tier
+  # GPT-5.5 with explicit tier (low..xhigh only)
   "gpt-5.5-low"|"gpt5.5-low")             echo "gpt-5.5:low" ;;
   "gpt-5.5-medium"|"gpt5.5-medium")       echo "gpt-5.5:medium" ;;
   "gpt-5.5-high"|"gpt5.5-high")           echo "gpt-5.5:high" ;;
   "gpt-5.5-xhigh"|"gpt-5.5-extra-high"|"gpt5.5-xhigh")
     echo "gpt-5.5:xhigh" ;;
-
-  # GPT-5.4 bare — medium effort
-  "gpt-5.4"|"gpt5.4"|"gpt-5-4")
-    echo "gpt-5.4:medium" ;;
-
-  # GPT-5.4 with explicit tier
-  "gpt-5.4-low"|"gpt5.4-low")             echo "gpt-5.4:low" ;;
-  "gpt-5.4-medium"|"gpt5.4-medium")       echo "gpt-5.4:medium" ;;
-  "gpt-5.4-high"|"gpt5.4-high")           echo "gpt-5.4:high" ;;
-  "gpt-5.4-xhigh"|"gpt-5.4-extra-high"|"gpt5.4-xhigh")
-    echo "gpt-5.4:xhigh" ;;
-
-  # GPT-5.4-mini — medium effort
-  "gpt-5.4-mini"|"gpt5.4-mini")
-    echo "gpt-5.4-mini:medium" ;;
-
-  # GPT-5.3 codex spark — medium effort
-  "gpt-5.3-codex-spark"|"codex-spark"|"spark")
-    echo "gpt-5.3-codex-spark:medium" ;;
-
-  # o-series: intrinsic reasoning, no effort flag
-  "o3")       echo "o3" ;;
-  "o4-mini"|"o4mini")  echo "o4-mini" ;;
-  "o4")       echo "o4" ;;
-  "o3-mini"|"o3mini")  echo "o3-mini" ;;
 
   # Pass-through: already looks like a full model ID or model:effort spec — trust it,
   # but warn on stderr so typos surface (stdout must stay exactly the resolved spec).
@@ -92,6 +86,6 @@ case "$normalized" in
     echo "$normalized" ;;
 
   *)
-    echo "ERROR: unrecognized model '${input}'. Known aliases: gpt-5.6 / sol / terra / luna [low|medium|high|xhigh|max], gpt-5.5 [low|medium|high|xhigh], gpt-5.4 [low|medium|high|xhigh], gpt-5.4-mini, codex-spark, o3, o4, o4-mini, o3-mini." >&2
+    echo "ERROR: unrecognized model '${input}'. Known aliases: astra / gpt-6 [low|medium|high|xhigh|max|ultra], gpt-5.6 / sol / terra [low|medium|high|xhigh|max|ultra], luna [low|medium|high|xhigh|max], gpt-5.5 [low|medium|high|xhigh]. Run 'codex debug models' to see the live catalog." >&2
     exit 1 ;;
 esac
